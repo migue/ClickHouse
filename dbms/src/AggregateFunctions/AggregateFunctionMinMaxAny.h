@@ -621,7 +621,7 @@ struct AggregateFunctionAnyHeavyData : Data
 
     using Self = AggregateFunctionAnyHeavyData<Data>;
 
-    bool changeIfBetter(const IColumn & column, size_t row_num, Arena *)
+    bool changeIfBetter(const IColumn & column, size_t row_num, Arena * arena)
     {
         if (this->isEqualTo(column, row_num))
         {
@@ -631,7 +631,7 @@ struct AggregateFunctionAnyHeavyData : Data
         {
             if (counter == 0)
             {
-                this->change(column, row_num);
+                this->change(column, row_num, arena);
                 ++counter;
                 return true;
             }
@@ -641,7 +641,7 @@ struct AggregateFunctionAnyHeavyData : Data
         return false;
     }
 
-    bool changeIfBetter(const Self & to, Arena *)
+    bool changeIfBetter(const Self & to, Arena * arena)
     {
         if (this->isEqualTo(to))
         {
@@ -651,7 +651,7 @@ struct AggregateFunctionAnyHeavyData : Data
         {
             if (counter < to.counter)
             {
-                this->change(to);
+                this->change(to, arena);
                 return true;
             }
             else
