@@ -176,7 +176,7 @@ private:
     using Self = SingleValueDataString;
 
     Int32 size = -1;    /// -1 indicates that there is no value.
-    UInt32 capacity = 0;    /// power of two or zero
+    Int32 capacity = 0;    /// power of two or zero
 
 public:
     static constexpr Int32 AUTOMATIC_STORAGE_SIZE = 64;
@@ -285,7 +285,7 @@ public:
 
     void change(const IColumn & column, size_t row_num, Arena * arena)
     {
-        changeImpl(static_cast<const ColumnString &>(column).getDataAtWithTerminatingZero(row_num), Arena * arena);
+        changeImpl(static_cast<const ColumnString &>(column).getDataAtWithTerminatingZero(row_num), arena);
     }
 
     void change(const Self & to, Arena * arena)
