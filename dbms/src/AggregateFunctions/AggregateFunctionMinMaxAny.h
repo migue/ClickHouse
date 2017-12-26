@@ -51,7 +51,7 @@ public:
             writeBinary(value, buf);
     }
 
-    void read(ReadBuffer & buf, const IDataType & /*data_type*/, Arena * arena)
+    void read(ReadBuffer & buf, const IDataType & /*data_type*/, Arena *)
     {
         readBinary(has_value, buf);
         if (has())
@@ -59,14 +59,14 @@ public:
     }
 
 
-    void change(const IColumn & column, size_t row_num, Arena * arena)
+    void change(const IColumn & column, size_t row_num, Arena *)
     {
         has_value = true;
         value = static_cast<const ColumnVector<T> &>(column).getData()[row_num];
     }
 
     /// Assuming to.has()
-    void change(const Self & to, Arena * arena)
+    void change(const Self & to, Arena *)
     {
         has_value = true;
         value = to.value;
@@ -76,7 +76,7 @@ public:
     {
         if (!has())
         {
-            change(column, row_num);
+            change(column, row_num, arena);
             return true;
         }
         else
@@ -87,7 +87,7 @@ public:
     {
         if (!has() && to.has())
         {
-            change(to);
+            change(to, arena);
             return true;
         }
         else
@@ -96,7 +96,7 @@ public:
 
     bool changeEveryTime(const IColumn & column, size_t row_num, Arena * arena)
     {
-        change(column, row_num);
+        change(column, row_num, arena);
         return true;
     }
 
@@ -104,7 +104,7 @@ public:
     {
         if (to.has())
         {
-            change(to);
+            change(to, arena);
             return true;
         }
         else
@@ -115,7 +115,7 @@ public:
     {
         if (!has() || static_cast<const ColumnVector<T> &>(column).getData()[row_num] < value)
         {
-            change(column, row_num);
+            change(column, row_num, arena);
             return true;
         }
         else
@@ -126,7 +126,7 @@ public:
     {
         if (to.has() && (!has() || to.value < value))
         {
-            change(to);
+            change(to, arena);
             return true;
         }
         else
@@ -137,7 +137,7 @@ public:
     {
         if (!has() || static_cast<const ColumnVector<T> &>(column).getData()[row_num] > value)
         {
-            change(column, row_num);
+            change(column, row_num, arena);
             return true;
         }
         else
@@ -148,7 +148,7 @@ public:
     {
         if (to.has() && (!has() || to.value > value))
         {
-            change(to);
+            change(to, arena);
             return true;
         }
         else
@@ -180,7 +180,7 @@ private:
 
 public:
     static constexpr Int32 AUTOMATIC_STORAGE_SIZE = 64;
-    static constexpr Int32 MAX_SMALL_STRING_SIZE = AUTOMATIC_STORAGE_SIZE - sizeof(size);
+    static constexpr Int32 MAX_SMALL_STRING_SIZE = AUTOMATIC_STORAGE_SIZE - sizeof(size) - sizeof(capacity);
 
 private:
     union __attribute__((__packed__, __aligned__(1)))
@@ -444,50 +444,50 @@ public:
         value = to.value;
     }
 
-    bool changeFirstTime(const IColumn & column, size_t row_num, Arena *)
+    bool changeFirstTime(const IColumn & column, size_t row_num, Arena * arena)
     {
         if (!has())
         {
-            change(column, row_num);
+            change(column, row_num, arena);
             return true;
         }
         else
             return false;
     }
 
-    bool changeFirstTime(const Self & to, Arena *)
+    bool changeFirstTime(const Self & to, Arena * arena)
     {
         if (!has() && to.has())
         {
-            change(to);
+            change(to, arena);
             return true;
         }
         else
             return false;
     }
 
-    bool changeEveryTime(const IColumn & column, size_t row_num, Arena *)
+    bool changeEveryTime(const IColumn & column, size_t row_num, Arena * arena)
     {
-        change(column, row_num);
+        change(column, row_num, arena);
         return true;
     }
 
-    bool changeEveryTime(const Self & to, Arena *)
+    bool changeEveryTime(const Self & to, Arena * arena)
     {
         if (to.has())
         {
-            change(to);
+            change(to, arena);
             return true;
         }
         else
             return false;
     }
 
-    bool changeIfLess(const IColumn & column, size_t row_num, Arena *)
+    bool changeIfLess(const IColumn & column, size_t row_num, Arena * arena)
     {
         if (!has())
         {
-            change(column, row_num);
+            change(column, row_num, arena);
             return true;
         }
         else
@@ -504,22 +504,22 @@ public:
         }
     }
 
-    bool changeIfLess(const Self & to, Arena *)
+    bool changeIfLess(const Self & to, Arena * arena)
     {
         if (to.has() && (!has() || to.value < value))
         {
-            change(to);
+            change(to, arena);
             return true;
         }
         else
             return false;
     }
 
-    bool changeIfGreater(const IColumn & column, size_t row_num, Arena *)
+    bool changeIfGreater(const IColumn & column, size_t row_num, Arena * arena)
     {
         if (!has())
         {
-            change(column, row_num);
+            change(column, row_num, arena);
             return true;
         }
         else
@@ -536,11 +536,11 @@ public:
         }
     }
 
-    bool changeIfGreater(const Self & to, Arena *)
+    bool changeIfGreater(const Self & to, Arena * arena)
     {
         if (to.has() && (!has() || to.value > value))
         {
-            change(to);
+            change(to, arena);
             return true;
         }
         else
