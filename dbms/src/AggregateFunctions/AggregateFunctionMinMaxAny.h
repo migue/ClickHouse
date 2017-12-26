@@ -668,7 +668,7 @@ struct AggregateFunctionAnyHeavyData : Data
 
     void read(ReadBuffer & buf, const IDataType & data_type, Arena * arena)
     {
-        Data::read(buf, data_type);
+        Data::read(buf, data_type, arena);
         readBinary(counter, buf);
     }
 
