@@ -51,7 +51,7 @@ public:
             writeBinary(value, buf);
     }
 
-    void read(ReadBuffer & buf, const IDataType & /*data_type*/)
+    void read(ReadBuffer & buf, const IDataType & /*data_type*/, Arena * arena)
     {
         readBinary(has_value, buf);
         if (has())
@@ -59,20 +59,20 @@ public:
     }
 
 
-    void change(const IColumn & column, size_t row_num)
+    void change(const IColumn & column, size_t row_num, Arena * arena)
     {
         has_value = true;
         value = static_cast<const ColumnVector<T> &>(column).getData()[row_num];
     }
 
     /// Assuming to.has()
-    void change(const Self & to)
+    void change(const Self & to, Arena * arena)
     {
         has_value = true;
         value = to.value;
     }
 
-    bool changeFirstTime(const IColumn & column, size_t row_num)
+    bool changeFirstTime(const IColumn & column, size_t row_num, Arena * arena)
     {
         if (!has())
         {
@@ -83,7 +83,7 @@ public:
             return false;
     }
 
-    bool changeFirstTime(const Self & to)
+    bool changeFirstTime(const Self & to, Arena * arena)
     {
         if (!has() && to.has())
         {
@@ -94,13 +94,13 @@ public:
             return false;
     }
 
-    bool changeEveryTime(const IColumn & column, size_t row_num)
+    bool changeEveryTime(const IColumn & column, size_t row_num, Arena * arena)
     {
         change(column, row_num);
         return true;
     }
 
-    bool changeEveryTime(const Self & to)
+    bool changeEveryTime(const Self & to, Arena * arena)
     {
         if (to.has())
         {
@@ -111,7 +111,7 @@ public:
             return false;
     }
 
-    bool changeIfLess(const IColumn & column, size_t row_num)
+    bool changeIfLess(const IColumn & column, size_t row_num, Arena * arena)
     {
         if (!has() || static_cast<const ColumnVector<T> &>(column).getData()[row_num] < value)
         {
@@ -122,7 +122,7 @@ public:
             return false;
     }
 
-    bool changeIfLess(const Self & to)
+    bool changeIfLess(const Self & to, Arena * arena)
     {
         if (to.has() && (!has() || to.value < value))
         {
@@ -133,7 +133,7 @@ public:
             return false;
     }
 
-    bool changeIfGreater(const IColumn & column, size_t row_num)
+    bool changeIfGreater(const IColumn & column, size_t row_num, Arena * arena)
     {
         if (!has() || static_cast<const ColumnVector<T> &>(column).getData()[row_num] > value)
         {
@@ -144,7 +144,7 @@ public:
             return false;
     }
 
-    bool changeIfGreater(const Self & to)
+    bool changeIfGreater(const Self & to, Arena * arena)
     {
         if (to.has() && (!has() || to.value > value))
         {
