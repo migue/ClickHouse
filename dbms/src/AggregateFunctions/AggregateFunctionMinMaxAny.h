@@ -177,17 +177,14 @@ private:
 
     Int32 size = -1;    /// -1 indicates that there is no value.
     Int32 capacity = 0;    /// power of two or zero
+    char * __attribute__((__packed__, __aligned__(1))) large_data;
 
 public:
     static constexpr Int32 AUTOMATIC_STORAGE_SIZE = 64;
-    static constexpr Int32 MAX_SMALL_STRING_SIZE = AUTOMATIC_STORAGE_SIZE - sizeof(size) - sizeof(capacity);
+    static constexpr Int32 MAX_SMALL_STRING_SIZE = AUTOMATIC_STORAGE_SIZE - sizeof(size) - sizeof(capacity) - sizeof(large_data);
 
 private:
-    union __attribute__((__packed__, __aligned__(1)))
-    {
-        char small_data[MAX_SMALL_STRING_SIZE]; /// Including the terminating zero.
-        char * __attribute__((__packed__, __aligned__(1))) large_data;
-    };
+    char small_data[MAX_SMALL_STRING_SIZE]; /// Including the terminating zero.
 
 public:
     bool has() const
