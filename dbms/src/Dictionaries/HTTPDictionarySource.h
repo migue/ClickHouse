@@ -3,7 +3,7 @@
 #include <Dictionaries/IDictionarySource.h>
 #include <Dictionaries/DictionaryStructure.h>
 #include <common/LocalDateTime.h>
-
+#include <IO/HTTPTimeouts.h>
 
 namespace Poco { class Logger; }
 
