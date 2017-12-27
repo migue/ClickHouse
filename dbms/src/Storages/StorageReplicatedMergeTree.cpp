@@ -21,6 +21,7 @@
 
 #include <IO/ReadBufferFromString.h>
 #include <IO/Operators.h>
+#include <IO/HTTPTimeouts.h>
 
 #include <Interpreters/InterpreterAlterQuery.h>
 #include <Interpreters/PartLog.h>
@@ -2125,8 +2126,9 @@ bool StorageReplicatedMergeTree::fetchPart(const String & part_name, const Strin
 
     Stopwatch stopwatch;
 
+    HTTPTimeouts timeouts(context.getSettingsRef());
     MergeTreeData::MutableDataPartPtr part = fetcher.fetchPart(
-        part_name, replica_path, address.host, address.replication_port, to_detached);
+        part_name, replica_path, address.host, address.replication_port, timeouts, to_detached);
 
     if (!to_detached)
     {

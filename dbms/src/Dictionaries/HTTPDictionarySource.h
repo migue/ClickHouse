@@ -48,6 +48,7 @@ private:
     const std::string format;
     Block sample_block;
     const Context & context;
+    HTTPTimeouts timeouts;
 };
 
 }
